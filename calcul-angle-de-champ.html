@@ -1,0 +1,49 @@
+          <script language="JavaScript">
+             <!--
+
+             function calcule_anglechamp()
+             {
+                var f = document.form_anglechamp.focale.value
+                var l = document.form_anglechamp.longueur.value
+                if(isNaN(f) || isNaN(l))
+                   {
+                      return
+                   }
+                var resultat = 57.3 * 2 * Math.atan( l / 2 / f)
+                document.getElementById('td_anglechamp').innerHTML = Math.round(resultat*100)/100
+             }
+             -->
+          </script>
+
+        <div>
+        <FORM name="form_anglechamp">
+           <table cellspacing="30">
+              <tr>
+                 <td><b>Entrées</b></td>
+                 <td><b>Résultats</b></td>
+              </tr>
+              <tr>
+                 <td>
+                    <table>
+                       <tr>
+                          <td>Focale <span style="font-size: smaller;">(en mm)</span></td>
+                          <td><INPUT type="text" name="focale" oninput="calcule_anglechamp()" size= "4" maxlength="4" value="10" alt="Focale (en mm)"></td>
+                       </tr>
+                       <tr>
+                          <td>Longueur <span style="font-size: smaller;">(en mm)</span></td>
+                          <td><INPUT type="text" name="longueur" oninput="calcule_anglechamp()" size= "4" maxlength="4" value="10" alt="Longueur (en mm)"></td>
+                       </tr>
+                    </table>
+                 </td>
+                 <td>
+                    <table>
+                       <tr>
+                          <td>Angle de champ <span style="font-size: smaller;">(en degrés decimaux) : </span></td>
+                          <td width="60" id="td_anglechamp">53.13</td>
+                       </tr>
+                    </table>
+                 </td>
+              </tr>
+           </table>
+        </FORM>
+        </div>
