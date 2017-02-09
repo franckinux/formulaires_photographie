@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<!--
+license : GPL 3.0
+copyright : Franck Barbenoire (franck@barbenoi.re)
+-->
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Calcul de photographie</title>
+    <script>
+      <!--
+        "use strict";
+
+        function calcule_angle_champ() {
+          var f = document.form_angle_champ.focale.value;
+          var l = document.form_angle_champ.longueur.value;
+          if(isNaN(f) || isNaN(l)) {
+            return;
+          }
+          var resultat = 57.3 * 2 * Math.atan( l / 2 / f);
+          document.form_angle_champ.td_anglechamp.value = Math.round(resultat*100)/100;
+        }
+
+        function calcule_profondeur_champ() {
+          var f = document.form_profondeur_champ.focale.value;
+          var c = document.form_profondeur_champ.cercle.value;
+          var d = document.form_profondeur_champ.distance.value;
+          if(isNaN(f) || isNaN(c) || isNaN(d)) {
+            return;
+          }
+          var n = document.form_profondeur_champ.ouverture.value;
+          var f2 = f*f;
+          var dcn = d*c*n*1000;
+          var pdc_anterieur = f2*d / (f2 + dcn);
+          if (pdc_anterieur >= 1000)
+            document.form_profondeur_champ.pdc_anterieur.value = "Infini";
+          else
+            document.form_profondeur_champ.pdc_anterieur.value = Math.round(pdc_anterieur*1000)/1000;
+          if (dcn < f2) {
+            var pdc_posterieur = f2*d / (f2 - dcn);
+            var pdc = pdc_posterieur - pdc_anterieur;
+            var pc_anterieur = Math.round(((d - pdc_anterieur) / pdc) * 100);
+            var pc_posterieur = Math.round(((pdc_posterieur - d) / pdc) * 100);
+            if (pdc_posterieur >= 1000)
+              document.form_profondeur_champ.pdc_posterieur.value = "Infini";
+            else
+              document.form_profondeur_champ.pdc_posterieur.value = Math.round(pdc_posterieur*1000)/1000;
+            if (pdc >= 1000)
+              document.form_profondeur_champ.pdc.value = "Infini";
+            else
+              document.form_profondeur_champ.pdc.value = Math.round(pdc*1000)/1000;
+              document.form_profondeur_champ.pc_anterieur.value = pc_anterieur;
+              document.form_profondeur_champ.pc_posterieur.value = pc_posterieur;
+           } else {
+              document.form_profondeur_champ.pdc_posterieur.value = "Infini";
+              document.form_profondeur_champ.pdc.value = "Infini";
+              document.form_profondeur_champ.pc_anterieur.value = "0";
+              document.form_profondeur_champ.pc_posterieur.value = "100";
+           }
+        }
+
+        function calcule_hyperfocale() {
+          var f = document.form_hyperfocale.focale.value;
+          var c = document.form_hyperfocale.cercle.value;
+          if(isNaN(f) || isNaN(c)) {
+            return;
+          }
+          var n = document.form_hyperfocale.ouverture.value;
+          var resultat = f * f / n / c / 1000;
+          if (resultat >= 1000)
+            document.form_hyperfocale.td_hyperfocale.value = "Infini";
+          else
+            document.form_hyperfocale.td_hyperfocale.value = Math.round(resultat*1000)/1000;
+        }
+    </script>
+    <style type="text/css">
+      /* styles pour les tabs : https://codepen.io/CesarGabriel/pen/nLhAa?editors=1000 */
+      * {
+        font-family: Arial, sans;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+      }
+
+      #container {
+        margin: 0 auto;
+        width: 50%;
+      }
+
+      #container > input {
+        height: 2.5em;
+        visibility: hidden;
+      }
+
+      #container > label {
+        background: #f9f9f9;
+        border-radius: .25em .25em 0 0;
+        color: #888;
+        cursor: pointer;
+        display: block;
+        float: left;
+        font-size: 1em;
+        height: 2.5em;
+        line-height: 2.5em;
+        margin-right: .25em;
+        padding: 0 1.5em;
+        text-align: center;
+      }
+
+      #container > input:hover + label {
+        background: #ddd;
+        color: #666;
+      }
+
+      #container > input:checked + label {
+        background: #f1f1f1;
+        color: #444;
+        position: relative;
+        z-index: 6;
+      }
+
+      #content {
+        background: #f1f1f1;
+        border-radius: 0 .25em .25em .25em;
+        min-height: 20em;
+        position: relative;
+        width: 100%;
+        z-index: 5;
+      }
+
+      #content > div {
+        opacity: 0;
+        padding: 1.5em;
+        position: absolute;
+        z-index: -100;
+      }
+
+      #container input#tab-1:checked ~ #content #content-1,
+      #container input#tab-2:checked ~ #content #content-2,
+      #container input#tab-3:checked ~ #content #content-3 {
+        opacity: 1;
+        z-index: 100;
+      }
+
+      input.visible {
+        visibility: visible !important;
+      }
+
+      /* autres styles : http://callmenick.com/post/various-css-input-text-styles */
+      .entree, .sortie {
+        padding: 5px;
+        margin: 5px;
+        border: solid 1px #dcdcdc;
+        width: 6em;
+      }
+
+      .entree {
+        transition: box-shadow 0.3s, border 0.3s;
+      }
+
+      .entree:focus, .entree.focus {
+        border: solid 1px #707070;
+        box-shadow: 0 0 5px 1px #969696;
+      }
+
+      .sortie {
+        background-color: #d8d8d8;
+      }
+    </style>
+  </head>
+
+  <body onload="calcule_angle_champ();">
+    <div id="container">
+
+      <!-- 1er tab -->
+      <input id="tab-1" type="radio" class="tab" name="tab-group" checked="checked" onchange="calcule_angle_champ();" />
+      <label for="tab-1">Angle de champ</label>
+      <!-- 2eme tab -->
+      <input id="tab-2" type="radio" class="tab" name="tab-group" onchange="calcule_profondeur_champ();" />
+      <label for="tab-2">Profondeur de champ</label>
+      <!-- 3eme tab -->
+      <input id="tab-3" type="radio" class="tab" name="tab-group" onchange="calcule_hyperfocale();" />
+      <label for="tab-3">Hyperfocale</label>
+
+      <div id="content">
+        <!-- 1er tab -->
+        <div id="content-1">
+          <p>Ce formulaire permet de calculer </p>
+          <form name="form_angle_champ">
+            <table cellspacing="30">
+              <tr>
+                <td><b>Entrées</b></td>
+                <td><b>Résultats</b></td>
+              </tr>
+              <tr>
+                <td>
+                  <table>
+                    <tr>
+                      <td>Focale <span style="font-size: smaller;">(en mm)</span></td>
+                      <td><input type="text" class="entree" name="focale" oninput="calcule_angle_champ()" value="10"></td>
+                    </tr>
+                    <tr>
+                      <td>Longueur <span style="font-size: smaller;">(en mm)</span></td>
+                      <td><input type="text" class="entree" name="longueur" oninput="calcule_angle_champ()" value="10"></td>
+                    </tr>
+                  </table>
+                </td>
+                <td>
+                    <table>
+                       <tr>
+                          <td>Angle de champ <span style="font-size: smaller;">(en degrés decimaux)</span></td>
+                          <td><input type="text" class="sortie" name="td_anglechamp" readonly /></td>
+                       </tr>
+                    </table>
+                </td>
+              </tr>
+            </table>
+          </form>
+        </div>
+
+        <!-- 2eme tab -->
+        <div id="content-2">
+          <p>Ce formulaire permet de calculer </p>
+          <form name="form_profondeur_champ">
+            <table cellspacing="30">
+              <tr>
+                <td><b>Entrées</b></td>
+                <td><b>Résultats</b></td>
+              </tr>
+              <tr>
+                <td>
+                  <table>
+                    <tr>
+                      <td>Focale <span style="font-size: smaller;">(en mm)</span></td>
+                      <td><input type="text" class="entree" name="focale" oninput="calcule_profondeur_champ()" value="10"></td>
+                    </tr>
+                    <tr>
+                      <td>Cercle de confusion<br><span style="font-size: smaller;"><a href="http://www.dofmaster.com/digital_coc.html" target="_blank">Valeurs</a></span></td>
+                      <td><input type="text" class="entree" name="cercle" oninput="calcule_profondeur_champ()" value="0.019"></td>
+                    </tr>
+                    <tr>
+                      <td>Ouverture</td>
+                      <td>
+                        <select name="ouverture" onchange="calcule_profondeur_champ()">
+                          <option value="1">f1</option>
+                          <option value="1.4">f1.4</option>
+                          <option value="2">f2</option>
+                          <option value="2.8">f2,8</option>
+                          <option value="4">f4</option>
+                          <option value="5.6">f5.6</option>
+                          <option value="8" selected>f8</option>
+                          <option value="11">f11</option>
+                          <option value="16">f16</option>
+                          <option value="22">f22</option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Distance de mise au point <span style="font-size: smaller;">(en m)</span></td>
+                      <td><input type="text" class="entree" name="distance" value="5" oninput="calcule_profondeur_champ()"></td>
+                    </tr>
+                  </table>
+                </td>
+                <td>
+                    <table>
+                       <tr>
+                          <td>Distance antérieure <span style="font-size: smaller;">(en m)</span></td>
+                          <td><input type="text" class="sortie" name="pdc_anterieur" readonly /></td>
+                       </tr>
+                       <tr>
+                          <td>Distance postérieure <span style="font-size: smaller;">(en m)</span></td>
+                          <td><input type="text" class="sortie" name="pdc_posterieur" readonly /></td>
+                       </tr>
+                       <tr>
+                          <td>Profondeur de champ <span style="font-size: smaller;">(en m)</span></td>
+                          <td><input type="text" class="sortie" name="pdc" readonly /></td>
+                       </tr>
+                       <tr>
+                          <td>Pourcentage antérieur</td>
+                          <td><input type="text" class="sortie" name="pc_anterieur" readonly /></td>
+                       </tr>
+                       <tr>
+                          <td>Pourcentage postérieur</td>
+                          <td><input type="text" class="sortie" name="pc_posterieur" readonly /></td>
+                       </tr>
+                    </table>
+                </td>
+              </tr>
+            </table>
+          </form>
+        </div>
+
+        <!-- 3eme tab -->
+        <div id="content-3">
+          <p>Ce formulaire permet de calculer </p>
+          <form name="form_hyperfocale">
+            <table cellspacing="30">
+              <tr>
+                <td><b>Entrées</b></td>
+                <td><b>Résultats</b></td>
+              </tr>
+              <tr>
+                <td>
+                  <table>
+                    <tr>
+                      <td>Focale <span style="font-size: smaller;">(en mm)</span></td>
+                      <td><input type="text" class="entree" name="focale" oninput="calcule_hyperfocale()" value="10"></td>
+                    </tr>
+                    <tr>
+                      <td>Cercle de confusion<br><span style="font-size: smaller;"><a href="http://www.dofmaster.com/digital_coc.html" target="_blank">Valeurs</a></span></td>
+                      <td><input type="text" class="entree" name="cercle" oninput="calcule_hyperfocale()" value="0.019"></td>
+                    </tr>
+                    <tr>
+                      <td>Ouverture</td>
+                      <td>
+                        <select name="ouverture" onchange="calcule_hyperfocale()">
+                          <option value="1">f1</option>
+                          <option value="1.4">f1.4</option>
+                          <option value="2">f2</option>
+                          <option value="2.8">f2,8</option>
+                          <option value="4">f4</option>
+                          <option value="5.6">f5.6</option>
+                          <option value="8" selected>f8</option>
+                          <option value="11">f11</option>
+                          <option value="16">f16</option>
+                          <option value="22">f22</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td>
+                  <table>
+                    <tr>
+                      <td>Hyperfocale <span style="font-size: smaller;">(en m)</span></td>
+                      <td><input type="text" class="sortie" name="td_hyperfocale" readonly /></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+           </table>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>
