@@ -11,10 +11,43 @@ copyright : Franck Barbenoire (franck@barbenoi.re)
       <!--
         "use strict";
 
+        function clear_results() {
+          var x = document.getElementsByClassName("sortie");
+          var i;
+          for (i = 0; i < x.length; i++) {
+            x[i].value = "-";
+          }
+        }
+
+        function is_valid_number(n) {
+          if(!isNaN(n)) {
+            var v = parseFloat(n)
+            if (v < 0) {
+              clear_results();
+              alert("Nombre négatif interdit");
+              return false;
+            }
+            return true;
+          } else {
+            clear_results();
+            alert("Format de nombre invalide");
+            return false;
+          }
+        }
+
+        function check_input(event, func) {
+          if(is_valid_number(event.target.value)) {
+            func();
+          } else {
+            clear_results();
+          }
+        }
+
         function calcule_angle_champ() {
           var f = document.form_angle_champ.focale.value;
           var l = document.form_angle_champ.longueur.value;
           if(isNaN(f) || isNaN(l)) {
+            clear_results();
             return;
           }
           var resultat = 57.3 * 2 * Math.atan( l / 2 / f);
@@ -26,6 +59,7 @@ copyright : Franck Barbenoire (franck@barbenoi.re)
           var c = document.form_profondeur_champ.cercle.value;
           var d = document.form_profondeur_champ.distance.value;
           if(isNaN(f) || isNaN(c) || isNaN(d)) {
+            clear_results();
             return;
           }
           var n = document.form_profondeur_champ.ouverture.value;
@@ -63,6 +97,7 @@ copyright : Franck Barbenoire (franck@barbenoi.re)
           var f = document.form_hyperfocale.focale.value;
           var c = document.form_hyperfocale.cercle.value;
           if(isNaN(f) || isNaN(c)) {
+            clear_results();
             return;
           }
           var n = document.form_hyperfocale.ouverture.value;
@@ -236,11 +271,11 @@ copyright : Franck Barbenoire (franck@barbenoi.re)
                   <table>
                     <tr>
                       <td>Focale <span style="font-size: smaller;">(en mm)</span></td>
-                      <td><input type="text" class="entree" name="focale" oninput="calcule_angle_champ()" value="10"></td>
+                      <td><input type="text" class="entree" name="focale" oninput="check_input(event, calcule_angle_champ);" value="10"></td>
                     </tr>
                     <tr>
                       <td>Longueur <span style="font-size: smaller;">(en mm)</span></td>
-                      <td><input type="text" class="entree" name="longueur" oninput="calcule_angle_champ()" value="10"></td>
+                      <td><input type="text" class="entree" name="longueur" oninput="check_input(event, calcule_angle_champ);" value="10"></td>
                     </tr>
                   </table>
                 </td>
@@ -271,11 +306,11 @@ copyright : Franck Barbenoire (franck@barbenoi.re)
                   <table>
                     <tr>
                       <td>Focale <span style="font-size: smaller;">(en mm)</span></td>
-                      <td><input type="text" class="entree" name="focale" oninput="calcule_profondeur_champ()" value="10"></td>
+                      <td><input type="text" class="entree" name="focale" oninput="check_input(event, calcule_profondeur_champ);" value="10"></td>
                     </tr>
                     <tr>
                       <td>Cercle de confusion<br><span style="font-size: smaller;"><a href="http://www.dofmaster.com/digital_coc.html" target="_blank">Valeurs</a></span></td>
-                      <td><input type="text" class="entree" name="cercle" oninput="calcule_profondeur_champ()" value="0.019"></td>
+                      <td><input type="text" class="entree" name="cercle" oninput="check_input(event, calcule_profondeur_champ);" value="0.019"></td>
                     </tr>
                     <tr>
                       <td>Ouverture</td>
@@ -296,7 +331,7 @@ copyright : Franck Barbenoire (franck@barbenoi.re)
                     </tr>
                     <tr>
                       <td>Distance de mise au point <span style="font-size: smaller;">(en m)</span></td>
-                      <td><input type="text" class="entree" name="distance" value="5" oninput="calcule_profondeur_champ()"></td>
+                      <td><input type="text" class="entree" name="distance" value="5" oninput="check_input(event, calcule_profondeur_champ);"></td>
                     </tr>
                   </table>
                 </td>
@@ -343,11 +378,11 @@ copyright : Franck Barbenoire (franck@barbenoi.re)
                   <table>
                     <tr>
                       <td>Focale <span style="font-size: smaller;">(en mm)</span></td>
-                      <td><input type="text" class="entree" name="focale" oninput="calcule_hyperfocale()" value="10"></td>
+                      <td><input type="text" class="entree" name="focale" oninput="check_input(event, calcule_hyperfocale);" value="10"></td>
                     </tr>
                     <tr>
                       <td>Cercle de confusion<br><span style="font-size: smaller;"><a href="http://www.dofmaster.com/digital_coc.html" target="_blank">Valeurs</a></span></td>
-                      <td><input type="text" class="entree" name="cercle" oninput="calcule_hyperfocale()" value="0.019"></td>
+                      <td><input type="text" class="entree" name="cercle" oninput="check_input(event, calcule_hyperfocale);" value="0.019"></td>
                     </tr>
                     <tr>
                       <td>Ouverture</td>
